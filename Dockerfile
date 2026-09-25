@@ -5,9 +5,8 @@ USER root
 
 # Create the persistence directory and ensure proper ownership
 RUN mkdir -p /home/openhands/.openhands && \
-    chown -R openhands:openhands /home/openhands/.openhands && \
-    chmod -R 755 /home/openhands/.openhands && \
-    chown -R openhands:openhands /home/openhands
+    chown -R openhands:openhands /home/openhands 2>/dev/null || true && \
+    chmod -R 755 /home/openhands/.openhands 2>/dev/null || true
 
 # Create an entrypoint wrapper that handles permissions and drops privileges
 RUN cat > /entrypoint-wrapper.sh << 'EOFSCRIPT'
@@ -16,12 +15,13 @@ set -e
 
 # Fix permissions on the mounted volume (run as root)
 if [ -d /home/openhands/.openhands ]; then
-    chown -R openhands:openhands /home/openhands/.openhands
-    chmod -R 755 /home/openhands/.openhands
+    # Try to fix permissions, but ignore errors from system directories like lost+found
+    chown -R openhands:openhands /home/openhands/.openhands 2>/dev/null || true
+    chmod -R 755 /home/openhands/.openhands 2>/dev/null || true
 fi
 
 # Ensure the directory exists
-mkdir -p /home/openhands/.openhands
+mkdir -p /home/openhands/.openhands 2>/dev/null || true
 
 # Drop to openhands user and run the original entrypoint
 exec gosu openhands "$@"
