@@ -11,7 +11,7 @@ fi
 mkdir -p /home/openhands/.openhands 2>/dev/null || true
 exec gosu openhands "$@"
 EOFEND
-chmod +x /entrypoint/wrapper.sh
+RUN chmod +x /entrypoint/wrapper.sh
 ENTRYPOINT ["/entrypoint/wrapper.sh"]
 CMD ["python", "-m", "openhands.automation.app"]
 
